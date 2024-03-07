@@ -92,18 +92,31 @@ let isFirstNumber = true;
  */
 function updateInput (input, isNumber = false) {
     let existingInput = inputField.value;
-    console.log(`Before:${existingInput}`);
 
     if(!isNumber) { // For +/-
         if (existingInput.startsWith('-')) {
             inputField.value = existingInput.slice(1);
         }else { // Else add -
-            inputField.value = `-${existingInput}`;
+            inputField.value = parseFloat(`-${existingInput}`);
+        }
+        if (isFirstNumber) {
+            calculations.numOne = parseFloat(inputField.value);
+            console.log(calculations);
+        } else {
+            calculations.numTwo = parseFloat(inputField.value);
+            console.log(calculations);
         }
     } else { // For appending numbers
-        inputField.value = `${existingInput}${input}`;
+        inputField.value = parseFloat(`${existingInput}${input}`);
+        if (isFirstNumber) {
+            calculations.numOne = parseFloat(inputField.value);
+            console.log(calculations);
+        } else {
+            calculations.numTwo = parseFloat(inputField.value);
+            console.log(calculations);
+        }
     }
-    console.log(`After:${inputField.value}`);
+
 }
 
 /**
@@ -113,16 +126,21 @@ function updateInput (input, isNumber = false) {
  * @param {string} operatorSymbol 
  */
 function operate(operatorSymbol) {
-    let currentInput = parseFloat(inputField.value);
-    if (isFirstNumber) {
-        calculations.numOne = currentInput;
-        isFirstNumber = false;
+    if (calculations.operator === '') {
+        calculations.operator = operatorSymbol;
+        if(calculations.result === 0) {
+          inputField.placeholder = parseFloat(inputField.value);  
+        }
+        inputField.value = null;
+        console.log(calculations);
+        isFirstNumber = false;  
     } else {
-        calculations.numTwo = currentInput;
+        calculations.operator = operatorSymbol;
+        inputField.value = null;
+        console.log(calculations);  
         performCalculation();
+        console.log(calculations);
     }
-    calculations.operator = operatorSymbol;
-    inputField.value = '';
 }
 
 /**
@@ -132,47 +150,31 @@ function operate(operatorSymbol) {
  * 'numTwo:', 'result:', and 'operator:'.
  * Calls POST function.
  */
-function performCalculation () {
-    if (calculations.numOne !== 0 && 
-        calculations.numTwo !== 0 && 
+function performCalculation() {
+    if ((calculations.numOne !== undefined && 
+        calculations.numTwo !== undefined) && 
         calculations.operator !== '') {
         sendToServer('/calculations', calculations)
-        .then( result => {
-            inputField.value = result.data.result;
-            calculations.numOne = result.data.result;
-            calculations.numTwo = 0;
-            calculations.operator ='';
-        }).catch ((error => {
-            console.error(`Calculation error, ${error}`);
-            alert(error);
-        }))
+            .then(result => {
+                let calculationResult = parseFloat(result.data.result);
+                inputField.placeholder = calculationResult;
+                calculations.result = calculationResult;
+                console.log(calculations);
+                calculations.numOne = calculationResult;
+                calculations.numTwo = 0;
+                calculations.operator = '';
+                isFirstNumber = false;
+                inputField.value = null;
+            })
+            .catch((error => {
+                console.error(`Calculation error, ${error}`);
+                alert(error);
+            }));
     } else {
-        alert('Error: Invalid calculation');
+        return;
     }
 }
 
-
-/**
- * Recieves Result from server as an object.
- * Object will contain 'firstNumber:', 
- * 'secondNumber:', 'operator:',
- * and 'answer:'.
- * Calls GET function.
- */
-
-
-/**
- * GET equation history.
- * Calls get function.
- */
-function getHistory() {
-    getFromServer('/history')
-    .then( response => {
-        console.log(response.data);
-    }).catch( error => {
-        console.error('Failed to fetch history:', error);
-    });
-}
 
 /**
  * POST information to server.
@@ -180,12 +182,7 @@ function getHistory() {
  * @param {object} object to be sent
  */
 function sendToServer(url, object) {
-    axios.post(url, object)
-    .then((res) => {
-        console.log(res);
-    }).catch((error) => {
-        console.log(error);
-    });
+   return axios.post(url, object);
 }
 
 /**
@@ -246,38 +243,41 @@ zeroButton.addEventListener('click', (event) => {
 decimalButton.addEventListener('click', (event) => {
     event.preventDefault();
     updateInput('.', true);
-})
+});
 // Operators
 clearButton.addEventListener('click', (event) => {
     event.preventDefault();
     inputField.value = '';
-})
+    isFirstNumber = true;
+});
 positiveNegativeButton.addEventListener('click', (event) => {
     event.preventDefault();
     updateInput(null, false);
-})
+});
 // Addition
 additionButton.addEventListener('click', (event) => {
     event.preventDefault();
     operate('+');
-})
+});
 // Subtraction
 subtractButton.addEventListener('click', (event) => {
     event.preventDefault();
     operate('-');
-})
+});
 // Division
 divideButton.addEventListener('click', (event) => {
     event.preventDefault();
     operate('/');
-})
+});
 // Multiplication
 multiplyButton.addEventListener('click', (event) => {
     event.preventDefault();
-    operate('x');
-})
+    operate('*');
+});
 // Submit
 submitButton.addEventListener('click', (event) => {
     event.preventDefault();
-    calculate();
-})
+    if(!isFirstNumber) {
+      performCalculation();  
+    }
+});

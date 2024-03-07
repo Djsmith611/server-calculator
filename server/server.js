@@ -7,16 +7,54 @@ app.use(express.static('server/public'));
 
 // Global variable that will contain all of the
 // calculation objects:
-let calculations = []
+let calculations = [];
 
 
 // Here's a wonderful place to make some routes:
 
 // GET /calculations
+app.get('/calculations', (req, res) => {
+  res.json(calculations);
+});
 
 // POST /calculations
+app.post('/calculations', (req, res) => {
+  const {numOne, numTwo, operator} = req.body;
+  const result = calculate(numOne, numTwo, operator);
+
+  if (typeof result === 'string' && result.startsWith('Error')) {
+    res.status(400).send({error: result});
+  } else {
+    calculations.push({numOne, numTwo, operator, result});
+    res.json({result});
+  }
+});
 
 
+
+function calculate (numOne, numTwo, operator) {
+ let result;
+  switch(operator) {
+    case '+':
+      result = numOne + numTwo;
+      break;
+    case '-':
+      result = numOne - numTwo;
+      break;
+    case '*':
+      result = numOne * numTwo;
+      break;
+    case '/':
+      result = numTwo !== 0 ? numOne / numTwo :"Error: Division by zero";
+      break;
+    default:
+      return 'Error: Invalid operator';
+  }
+  return result;
+}
+
+
+// Moved bears out of harm's way.
 // PLEASE DO NOT MODIFY ANY CODE BELOW THESE BEARS:
 // 🐻  🐻‍❄️  🧸  🐻  🐻‍❄️  🧸  🐻  🐻‍❄️  🧸  🐻  🐻‍❄️  🧸
 

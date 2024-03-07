@@ -66,8 +66,17 @@ document.getElementById('submit-button');
 const inputField = 
 document.getElementById('input-field');
 
-const resultDisplay = 
-document.getElementById('result-display');
+const numOneDisplay = 
+document.getElementById('num-one');
+
+const numTwoDisplay =
+document.getElementById('num-two');
+
+const operatorDisplay =
+document.getElementById('operator');
+
+const resultDisplay =
+document.getElementById('result');
 
 const resultHistory = 
 document.getElementById('result-history');
@@ -101,18 +110,22 @@ function updateInput (input, isNumber = false) {
         }
         if (isFirstNumber) {
             calculations.numOne = parseFloat(inputField.value);
+            numOneDisplay.innerHTML = `${inputField.value}`;
             console.log(calculations);
         } else {
             calculations.numTwo = parseFloat(inputField.value);
+            numTwoDisplay.innerHTML = `${inputField.value}`;
             console.log(calculations);
         }
     } else { // For appending numbers
         inputField.value = parseFloat(`${existingInput}${input}`);
         if (isFirstNumber) {
             calculations.numOne = parseFloat(inputField.value);
+            numOneDisplay.innerHTML = `${inputField.value}`;
             console.log(calculations);
         } else {
             calculations.numTwo = parseFloat(inputField.value);
+            numTwoDisplay.innerHTML = `${inputField.value}`;
             console.log(calculations);
         }
     }
@@ -128,6 +141,7 @@ function updateInput (input, isNumber = false) {
 function operate(operatorSymbol) {
     if (calculations.operator === '') {
         calculations.operator = operatorSymbol;
+        operatorDisplay.innerHTML = `${operatorSymbol}`;
         if(calculations.result === 0) {
           inputField.placeholder = parseFloat(inputField.value);  
         }
@@ -136,6 +150,7 @@ function operate(operatorSymbol) {
         isFirstNumber = false;  
     } else {
         calculations.operator = operatorSymbol;
+        operatorDisplay.innerHTML = `${operatorSymbol}`;
         inputField.value = null;
         console.log(calculations);  
         performCalculation();
@@ -157,6 +172,7 @@ function performCalculation() {
         sendToServer('/calculations', calculations)
             .then(result => {
                 let calculationResult = parseFloat(result.data.result);
+                resultDisplay.innerHTML = `=${calculationResult}`;
                 inputField.placeholder = calculationResult;
                 calculations.result = calculationResult;
                 console.log(calculations);
@@ -165,6 +181,11 @@ function performCalculation() {
                 calculations.operator = '';
                 isFirstNumber = false;
                 inputField.value = null;
+                displayHistory();
+                numOneDisplay.innerHTML='';
+                numTwoDisplay.innerHTML='';
+                operatorDisplay.innerHTML='';
+                resultDisplay.innerHTML='';
             })
             .catch((error => {
                 console.error(`Calculation error, ${error}`);
@@ -175,6 +196,22 @@ function performCalculation() {
     }
 }
 
+
+function displayHistory() {
+    getFromServer('/calculations')
+        .then(response => {
+            let history = response.data;  
+            resultHistory.innerHTML = '';
+            history.forEach(calculation => {
+                let paragraph = document.createElement('p');
+                paragraph.innerHTML = `${calculation.numOne} ${calculation.operator} ${calculation.numTwo} = ${calculation.result}`;
+                resultHistory.appendChild(paragraph);
+            });
+        })
+        .catch(error => {
+            console.error('Failed to fetch history:', error);
+        });
+}
 
 /**
  * POST information to server.
@@ -190,12 +227,12 @@ function sendToServer(url, object) {
  * @param {string} url to recieve from
  */
 function getFromServer(url) {
-    axios.get(url)
-    .then((res) => {
-        console.log(res);
-    }).catch((error) => {
-        console.log(error);
-    });
+    return axios.get(url)
+    //.then((res) => {
+   //     console.log(res);
+    //}).catch((error) => {
+    //    console.log(error);
+   // });
 }
 
 // Event listeners
@@ -253,6 +290,10 @@ clearButton.addEventListener('click', (event) => {
     calculations.numTwo = 0;
     calculations.operator ='';
     calculations.result = 0;
+    resultDisplay.innerHTML ='';
+    numOneDisplay.innerHTML ='';
+    numTwoDisplay.innerHTML ='';
+    operatorDisplay.innerHTML ='';
     isFirstNumber = true;
 });
 positiveNegativeButton.addEventListener('click', (event) => {

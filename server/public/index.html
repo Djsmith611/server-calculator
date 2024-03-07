@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Server-Side Calculator</title>
-    <link rel="stylesheet" href="styles/style.css">    
+    <link rel="stylesheet" href="styles/style.css" />
     <script defer src="scripts/axios.js"></script>
     <script defer src="scripts/client.js" charset="utf-8"></script>
   </head>
   <body>
-    
     <div id="container">
       <h1>Server-Calculator</h1>
       <form data-testid="calculator" id="calculator-container">
-        <input id="input-field" type="number" placeholder="0" required>
+        <input id="input-field" type="number" placeholder="0" required />
         <!-- Row one -->
         <div id="row-one">
           <button id="clear-button" class="top-left">AC</button>
@@ -50,13 +49,16 @@
       </form>
     </div>
     <div id="result-container">
-     <section data-testid="recentResult" id="result-display">
+      <section data-testid="recentResult" id="result-display">
         <!-- The most recent calculation result goes here. -->
-        <p><span id="num-one"></span><span id="operator"></span><span id="num-two"></span><span id="result"></span></p>
+        <p>
+          <span id="num-one"></span><span id="operator"></span
+          ><span id="num-two"></span><span id="result"></span>
+        </p>
       </section>
       <section data-testid="resultHistory" id="result-history">
         <!-- The list of calculation results goes here. -->
-      </section> 
+      </section>
     </div>
   </body>
 </html>

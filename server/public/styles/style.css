@@ -1,8 +1,12 @@
 body {
-    background-color: rgb(50, 50, 50);
     display: flex;
     padding: 0;
     margin: 0;
+    background-image: url("../images/263282.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
   }
   h1 {
     text-align: center;
@@ -47,18 +51,22 @@ body {
   #zero-button {
     width: 115px;
   }
-  input {
-    margin: 5px;
-    height: 50px;
-    width: 235px;
-    text-align: right;
-    background-color: black;
-  }
   input,
   button {
     font-size: 20px;
     border-radius: 100px;
     color: aliceblue;
+  }
+  input {
+    font-size: 25px;
+    margin: 5px;
+    height: 50px;
+    width: 235px;
+    border-radius: 5px;
+    text-align: right;
+    background-color: black;
+    overflow: scroll;
+    letter-spacing: 3px;
   }
   #container {
     border: solid 5px rgba(0, 0, 0, 0.145);
@@ -67,9 +75,53 @@ body {
     margin: auto;
     margin-top: 50px;
     margin-right: 50px;
-    border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.145);
+    border-radius: 5px;
+    border-bottom-right-radius: 40px;
+    border-bottom-left-radius: 40px;
     box-shadow: 5px 5px 15px black;
+    --u: 0.5vmin;
+    --c1: hsl(0deg 0% 0%);
+    --c2: hsl(212deg 4% 9%);
+    --c3: hsl(212deg 7% 36%);
+    --gp: 50% / calc(var(--u) * 5) calc(var(--u) * 10);
+    --bp: calc(var(--u) * -2.5) calc(var(--u) * -5);
+    --bg: radial-gradient(circle at 50% 25%, var(--c2) 23%, #fff0 25% 100%)
+        var(--gp),
+      conic-gradient(from 270deg at 34% 46%, var(--c2) 0 12.5%, #fff0 0 100%)
+        var(--gp),
+      conic-gradient(from 45deg at 66% 46%, var(--c2) 0 12.5%, #fff0 0 100%)
+        var(--gp),
+      conic-gradient(from 180deg at 50% 80%, var(--c2) 0 12.5%, #fff0 0 100%)
+        var(--gp),
+      conic-gradient(from 135deg at 50% 80%, var(--c2) 0 12.5%, #fff0 0 100%)
+        var(--gp),
+      conic-gradient(from 0deg at 0% 20%, var(--c2) 0 12.5%, #fff0 0 100%)
+        var(--gp),
+      conic-gradient(from -45deg at 100% 20%, var(--c2) 0 12.5%, #fff0 0 100%)
+        var(--gp),
+      linear-gradient(
+          180deg,
+          var(--c2) 0 4.5%,
+          #fff0 0 45.25%,
+          var(--c2) 0 50%,
+          #fff0 0% 100%
+        )
+        var(--gp),
+      radial-gradient(
+          circle at 50% 25%,
+          #fff0 0 25%,
+          var(--c2) 26% 32%,
+          #fff0 0 100%
+        )
+        var(--gp),
+      linear-gradient(165deg, var(--c3) -15%, var(--c1) 44%, #fff0 0 100%)
+        var(--gp),
+      linear-gradient(180deg, var(--c1) 50%, #fff0 0 100%) var(--gp);
+    background: var(--bg), var(--bg);
+    background-position: var(--bp), var(--bp), var(--bp), var(--bp), var(--bp),
+      var(--bp), var(--bp), var(--bp), var(--bp), var(--bp), var(--bp), 0 0, 0 0,
+      0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+    background-color: var(--c2);
   }
   .top-left {
     background-color: rgb(133, 210, 206);
@@ -89,9 +141,7 @@ body {
   .center:hover {
     background-color: rgb(16, 78, 80);
   }
-  h2 {
-    text-align: center;
-  }
+  
   #result-display,
   #result-history-container {
     background-color: rgb(114, 122, 136);
@@ -107,12 +157,45 @@ body {
     background-color: rgb(0, 0, 0);
     border: solid 5px rgb(89, 89, 89);
     color: greenyellow;
+    overflow: hidden;
   }
   #result-history-container {
+    position: relative;
     margin-top: 50px;
     height: 345px;
+    background-color: black;
+    border: solid 5px black;
+    color: #000;
+    overflow: hidden;
+  }
+  h2 {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    text-shadow: 5px 5px 5px black;
+    background-color: #000000;
+  }
+  #result-history-container::before {
+    content: "";
+    z-index: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 60% 60%/3000px
+        3000px,
+      repeating-conic-gradient(#000 0 0.0001%, #fff 0 0.0002%) 40% 40%/4000px
+        3000px;
+    background-blend-mode: difference;
+    filter: blur(2px) contrast(100) brightness(40);
+    mix-blend-mode: lighten;
   }
   #result-history {
+    position: relative;
+    z-index: 1;
     height: 252px;
     width: auto;
     margin: 5px;

@@ -1,85 +1,60 @@
 // Global Variables
 // Calculator Variables
 // Row one
-const clearButton = 
-document.getElementById('clear-button');
+const clearButton = document.getElementById('clear-button');
 
-const positiveNegativeButton = 
-document.getElementById('positive-negative-button');
+const positiveNegativeButton = document.getElementById('positive-negative-button');
 
-const percentageButton = 
-document.getElementById('percentage-button');
+const percentageButton = document.getElementById('percentage-button');
 
-const divideButton = 
-document.getElementById('divide-button');
+const divideButton = document.getElementById('divide-button');
 
 // Row two
-const sevenButton = 
-document.getElementById('seven-button');
+const sevenButton = document.getElementById('seven-button');
 
-const eightButton = 
-document.getElementById('eight-button');
+const eightButton = document.getElementById('eight-button');
 
-const nineButton =
-document.getElementById('nine-button');
+const nineButton =document.getElementById('nine-button');
 
-const multiplyButton = 
-document.getElementById('multiply-button');
+const multiplyButton = document.getElementById('multiply-button');
 
 // Row three
-const fourButton = 
-document.getElementById('four-button');
+const fourButton = document.getElementById('four-button');
 
-const fiveButton = 
-document.getElementById('five-button');
+const fiveButton = document.getElementById('five-button');
 
-const sixButton = 
-document.getElementById('six-button');
+const sixButton = document.getElementById('six-button');
 
-const subtractButton = 
-document.getElementById('subtract-button');
+const subtractButton = document.getElementById('subtract-button');
 
 // Row four
-const oneButton = 
-document.getElementById('one-button');
+const oneButton = document.getElementById('one-button');
 
-const twoButton = 
-document.getElementById('two-button');
+const twoButton = document.getElementById('two-button');
 
-const threeButton = 
-document.getElementById('three-button');
+const threeButton = document.getElementById('three-button');
 
-const additionButton = 
-document.getElementById('addition-button');
+const additionButton = document.getElementById('addition-button');
 
 // Row five
-const zeroButton = 
-document.getElementById('zero-button');
+const zeroButton = document.getElementById('zero-button');
 
-const decimalButton = 
-document.getElementById('decimal-button');
+const decimalButton = document.getElementById('decimal-button');
 
-const submitButton = 
-document.getElementById('submit-button');
+const submitButton = document.getElementById('submit-button');
 
 // Display Fields
-const inputField = 
-document.getElementById('input-field');
+const inputField = document.getElementById('input-field');
 
-const numOneDisplay = 
-document.getElementById('num-one');
+const numOneDisplay = document.getElementById('num-one');
 
-const numTwoDisplay =
-document.getElementById('num-two');
+const numTwoDisplay = document.getElementById('num-two');
 
-const operatorDisplay =
-document.getElementById('operator');
+const operatorDisplay = document.getElementById('operator');
 
-const resultDisplay =
-document.getElementById('result');
+const resultDisplay = document.getElementById('result');
 
-const resultHistory = 
-document.getElementById('result-history');
+const resultHistory = document.getElementById('result-history');
 
 // Calculations object as specified by the 
 // instructions (for testing)
@@ -196,7 +171,9 @@ function performCalculation() {
     }
 }
 
-
+/**
+ * GET history from sserver and append it to the DOM
+ */
 function displayHistory() {
     getFromServer('/calculations')
         .then(response => {
@@ -227,12 +204,7 @@ function sendToServer(url, object) {
  * @param {string} url to recieve from
  */
 function getFromServer(url) {
-    return axios.get(url)
-    //.then((res) => {
-   //     console.log(res);
-    //}).catch((error) => {
-    //    console.log(error);
-   // });
+    return axios.get(url);
 }
 
 // Event listeners

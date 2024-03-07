@@ -17,35 +17,48 @@ app.get('/calculations', (req, res) => {
   res.json(calculations);
 });
 
-// POST /calculations
+/**
+ * POST '/calculations'
+ * recieves an object containing numOne, numTwo, and operator
+ * Pushes data for calculation, then returns the result.
+ */
 app.post('/calculations', (req, res) => {
-  const {numOne, numTwo, operator} = req.body;
-  const result = calculate(numOne, numTwo, operator);
+  let {numOne, numTwo, operator} = req.body;
+
+  let result = calculate(numOne, numTwo, operator);
 
   if (typeof result === 'string' && result.startsWith('Error')) {
-    res.status(400).send({error: result});
+    res.status(400).json({error: result});
   } else {
     calculations.push({numOne, numTwo, operator, result});
-    res.json({result});
+    res.status(201).json({result});
   }
 });
 
 
-
+/**
+ * Calculates the provided equation
+ * @param {Number} numOne 
+ * @param {Number} numTwo 
+ * @param {String} operator 
+ * @returns the result of the equation
+ */
 function calculate (numOne, numTwo, operator) {
  let result;
+ let numOneNum = parseFloat(numOne);
+ let numTwoNum = parseFloat(numTwo);
   switch(operator) {
     case '+':
-      result = numOne + numTwo;
+      result = numOneNum + numTwoNum;
       break;
     case '-':
-      result = numOne - numTwo;
+      result = numOneNum - numTwoNum;
       break;
     case '*':
-      result = numOne * numTwo;
+      result = numOneNum * numTwoNum;
       break;
     case '/':
-      result = numTwo !== 0 ? numOne / numTwo :"Error: Division by zero";
+      result = numTwoNum !== 0 ? numOneNum / numTwoNum :"Error: Division by zero";
       break;
     default:
       return 'Error: Invalid operator';

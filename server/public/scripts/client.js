@@ -96,8 +96,8 @@ function updateInput (input, isNumber = false) {
     if(!isNumber) { // For +/-
         if (existingInput.startsWith('-')) {
             inputField.value = existingInput.slice(1);
-        }else { // Else add -
-            inputField.value = parseFloat(`-${existingInput}`);
+        } else { // Else add -
+            inputField.value = `-${existingInput}`;
         }
         if (isFirstNumber) {
             calculations.numOne = parseFloat(inputField.value);
@@ -248,6 +248,11 @@ decimalButton.addEventListener('click', (event) => {
 clearButton.addEventListener('click', (event) => {
     event.preventDefault();
     inputField.value = '';
+    inputField.placeholder = 0;
+    calculations.numOne = 0;
+    calculations.numTwo = 0;
+    calculations.operator ='';
+    calculations.result = 0;
     isFirstNumber = true;
 });
 positiveNegativeButton.addEventListener('click', (event) => {

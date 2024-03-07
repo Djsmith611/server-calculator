@@ -10,7 +10,7 @@
     "start": "node server/server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.3"
   },
   "devDependencies": {
     "@testing-library/dom": "^9.3.1",
@@ -22,6 +22,6 @@
     "supertest": "^6.3.3"
   },
   "keywords": [],
-  "author": "",
+  "author": "David J Smith",
   "license": "ISC"
 }

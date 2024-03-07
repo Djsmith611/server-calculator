@@ -16,6 +16,25 @@ body {
     padding: 0;
     text-align: center;
   }
+  ul,
+  li {
+    margin: auto;
+    padding: 0;
+    text-align: left;
+    margin-left: 10px;
+    font-size: 20px;
+  }
+  ul {
+    list-style: none;
+  }
+  li::before {
+    content: "•";
+    color: black;
+    display: inline-block;
+    width: 20px;
+    margin-left: 20px;
+    text-align: left;
+  }
   input::placeholder {
     color: aliceblue;
   }
@@ -70,10 +89,13 @@ body {
   .center:hover {
     background-color: rgb(16, 78, 80);
   }
+  h2 {
+    text-align: center;
+  }
   #result-display,
-  #result-history {
-    background-color: rgb(156, 144, 127);
-    border: solid 5px rgb(95, 88, 77);
+  #result-history-container {
+    background-color: rgb(114, 122, 136);
+    border: solid 5px rgb(97, 99, 120);
     border-radius: 10px;
     height: 20px;
     width: 275px;
@@ -86,9 +108,40 @@ body {
     border: solid 5px rgb(89, 89, 89);
     color: greenyellow;
   }
-  #result-history {
+  #result-history-container {
     margin-top: 50px;
     height: 345px;
+  }
+  #result-history {
+    height: 252px;
+    width: auto;
+    margin: 5px;
+    overflow-y: auto;
+    border: 1px solid #000000;
+    padding: 10px;
+    background-color: rgb(29, 108, 110);
+    border-radius: 10px;
+    box-shadow: inset 5px 5px 15px black;
+  }
+  #result-history::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  #result-history::-webkit-scrollbar-track {
+    background: #3e3e3e;
+    border-radius: 20px;
+    margin: 2px;
+    padding: 0;
+    box-shadow: inset 5px 5px 5px black;
+  }
+  
+  #result-history::-webkit-scrollbar-thumb {
+    background: #423e77;
+    border-radius: 10px;
+  }
+  
+  #result-history::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
   #result-container {
     margin: auto;

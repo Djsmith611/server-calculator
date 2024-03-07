@@ -1,61 +1,45 @@
 // Global Variables
+
 // Calculator Variables
+
 // Row one
 const clearButton = document.getElementById("clear-button");
-
 const positiveNegativeButton = document.getElementById(
   "positive-negative-button"
 );
 
 const percentageButton = document.getElementById("percentage-button");
-
 const divideButton = document.getElementById("divide-button");
 
 // Row two
 const sevenButton = document.getElementById("seven-button");
-
 const eightButton = document.getElementById("eight-button");
-
 const nineButton = document.getElementById("nine-button");
-
 const multiplyButton = document.getElementById("multiply-button");
 
 // Row three
 const fourButton = document.getElementById("four-button");
-
 const fiveButton = document.getElementById("five-button");
-
 const sixButton = document.getElementById("six-button");
-
 const subtractButton = document.getElementById("subtract-button");
 
 // Row four
 const oneButton = document.getElementById("one-button");
-
 const twoButton = document.getElementById("two-button");
-
 const threeButton = document.getElementById("three-button");
-
 const additionButton = document.getElementById("addition-button");
 
 // Row five
 const zeroButton = document.getElementById("zero-button");
-
 const decimalButton = document.getElementById("decimal-button");
-
 const submitButton = document.getElementById("submit-button");
 
 // Display Fields
 const inputField = document.getElementById("input-field");
-
 const numOneDisplay = document.getElementById("num-one");
-
 const numTwoDisplay = document.getElementById("num-two");
-
 const operatorDisplay = document.getElementById("operator");
-
 const resultDisplay = document.getElementById("result");
-
 const resultHistory = document.getElementById("result-history");
 
 // Calculations object as specified by the
@@ -69,6 +53,35 @@ let calculations = {
 
 let isFirstNumber = true;
 
+function calculatePercentage(value) {
+  if (value === undefined) {
+    console.error("Invalid operation.");
+    alert("Invalid operation.");
+    return undefined;
+  }
+  return value / 100;
+}
+
+function getPercentage() {
+  let result;
+  if (isFirstNumber) {
+    result = calculatePercentage(calculations.numOne);
+    if (result !== undefined) {
+      calculations.numOne = result;
+      inputField.value = result;
+      numOneDisplay.innerHTML = `${result}`;
+    }
+  } else {
+    result = calculatePercentage(calculations.numTwo);
+    if (result !== undefined) {
+      calculations.numTwo = result;
+      inputField.value = result;
+      numTwoDisplay.innerHTML = `${result}`;
+    }
+  }
+  console.log(calculations);
+}
+
 /**
  * Appends a selected number to the input field
  * @param {number/string} input
@@ -78,7 +91,10 @@ let isFirstNumber = true;
  */
 function updateInput(input, isNumber = false) {
   let existingInput = inputField.value;
-
+  if (clearButton.innerHTML === "C") {
+    isClear = false;
+    clearButton.innerHTML = "AC";
+  }
   if (!isNumber) {
     // For +/-
     if (existingInput.startsWith("-")) {
@@ -118,23 +134,15 @@ function updateInput(input, isNumber = false) {
  * @param {string} operatorSymbol
  */
 function operate(operatorSymbol) {
-  if (calculations.operator === "") {
-    calculations.operator = operatorSymbol;
-    operatorDisplay.innerHTML = `${operatorSymbol}`;
-    if (calculations.result === 0) {
-      inputField.placeholder = parseFloat(inputField.value);
-    }
-    inputField.value = null;
-    console.log(calculations);
-    isFirstNumber = false;
-  } else {
-    calculations.operator = operatorSymbol;
-    operatorDisplay.innerHTML = `${operatorSymbol}`;
-    inputField.value = null;
-    console.log(calculations);
-    performCalculation();
-    console.log(calculations);
+  calculations.operator = operatorSymbol;
+  operatorDisplay.innerHTML = `${operatorSymbol}`;
+  if (calculations.numOne !== 0 && isFirstNumber) {
+    inputField.placeholder = inputField.value;
+    numOneDisplay.innerHTML = inputField.value;
   }
+  inputField.value = "";
+  console.log(calculations);
+  isFirstNumber = false;
 }
 
 /**
@@ -144,13 +152,13 @@ function operate(operatorSymbol) {
  * 'numTwo:', 'result:', and 'operator:'.
  * Calls POST function.
  */
-function performCalculation() {
+async function performCalculation() {
   if (
     calculations.numOne !== undefined &&
     calculations.numTwo !== undefined &&
     calculations.operator !== ""
   ) {
-    sendToServer("/calculations", calculations)
+    await sendToServer("/calculations", calculations)
       .then((result) => {
         let calculationResult = parseFloat(result.data.result);
         resultDisplay.innerHTML = `=${calculationResult}`;
@@ -161,9 +169,10 @@ function performCalculation() {
         calculations.numTwo = 0;
         calculations.operator = "";
         isFirstNumber = false;
-        inputField.value = null;
+        setTimeout(1000);
+        inputField.value = "";
         displayHistory();
-        numOneDisplay.innerHTML = "";
+        numOneDisplay.innerHTML = calculationResult;
         numTwoDisplay.innerHTML = "";
         operatorDisplay.innerHTML = "";
         resultDisplay.innerHTML = "";
@@ -186,9 +195,13 @@ function displayHistory() {
       let history = response.data;
       resultHistory.innerHTML = "";
       history.forEach((calculation) => {
-        let paragraph = document.createElement("p");
-        paragraph.innerHTML = `${calculation.numOne} ${calculation.operator} ${calculation.numTwo} = ${calculation.result}`;
-        resultHistory.appendChild(paragraph);
+        let item = document.createElement("li");
+        item.innerHTML = `
+        ${calculation.numOne} 
+        ${calculation.operator} 
+        ${calculation.numTwo} = 
+        ${calculation.result}`;
+        resultHistory.appendChild(item);
       });
     })
     .catch((error) => {
@@ -196,7 +209,7 @@ function displayHistory() {
     });
 }
 
-const isClear = false;
+let isClear = false;
 
 function clear() {
   if (isClear) {
@@ -214,9 +227,15 @@ function clear() {
     operatorDisplay.innerHTML = "";
     isFirstNumber = true;
     isClear = true;
+    clearButton.innerHTML = "C";
   }
 }
 
+/**
+ * DELETE '/calculation' data
+ * from server.
+ * Displays a message in the history field.
+ */
 function clearHistory() {
   axios
     .delete("/calculations")
@@ -226,6 +245,7 @@ function clearHistory() {
     .catch((error) => {
       console.error("Failed to delete history:", error);
     });
+  resultHistory.innerHTML = "<p>History Cleared.</p>";
 }
 
 /**
@@ -303,22 +323,46 @@ positiveNegativeButton.addEventListener("click", (event) => {
 // Addition
 additionButton.addEventListener("click", (event) => {
   event.preventDefault();
-  operate("+");
+  if (!isFirstNumber) {
+    performCalculation().then(() => {
+      operate("+");
+    });
+  } else {
+    operate("+");
+  }
 });
 // Subtraction
 subtractButton.addEventListener("click", (event) => {
   event.preventDefault();
-  operate("-");
+  if (!isFirstNumber) {
+    performCalculation().then(() => {
+      operate("-");
+    });
+  } else {
+    operate("-");
+  }
 });
 // Division
 divideButton.addEventListener("click", (event) => {
   event.preventDefault();
-  operate("/");
+  if (!isFirstNumber) {
+    performCalculation().then(() => {
+      operate("/");
+    });
+  } else {
+    operate("/");
+  }
 });
 // Multiplication
 multiplyButton.addEventListener("click", (event) => {
   event.preventDefault();
-  operate("*");
+  if (!isFirstNumber) {
+    performCalculation().then(() => {
+      operate("*");
+    });
+  } else {
+    operate("*");
+  }
 });
 // Submit
 submitButton.addEventListener("click", (event) => {
@@ -326,4 +370,8 @@ submitButton.addEventListener("click", (event) => {
   if (!isFirstNumber) {
     performCalculation();
   }
+});
+percentageButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  getPercentage();
 });

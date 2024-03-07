@@ -28,6 +28,14 @@ const submitButton = document.getElementById('submit-button');
 const inputField = document.getElementById('input-field'); // Input type number
 const resultDisplay = document.getElementById('result-display');
 const resultHistory = document.getElementById('result-history');
+// Calculations object as specified by the instructions (for testing)
+let calculations = {
+    numOne:0,
+    operator:'',
+    numTwo:0,
+    result:0
+}
+
 /**
  * Appends a selected number to the input field
  * @param{any} input
@@ -38,18 +46,37 @@ const resultHistory = document.getElementById('result-history');
 function updateInput (input, isNumber = false) {
     let existingInput = inputField.value;
     console.log(`Before:${existingInput}`);
-    //if(isNumber === false) { // For +/-
-        //if (existingInput.includes('-')){
-            // Remove -
-        //}else { // Else add -
-            //inputField.value = `${input}${existingInput}`;
-        //}
-    //} else {
+
+    if(!isNumber) { // For +/-
+        if (existingInput.startsWith('-')) {
+            inputField.value = existingInput.slice(1);
+        }else { // Else add -
+            inputField.value = `-${existingInput}`;
+        }
+    } else { // For appending numbers
         inputField.value = `${existingInput}${input}`;
-    //}
+    }
     console.log(`After:${inputField.value}`);
 }
 
+function operate(operatorSymbol) {
+    if (submitButton.classList.contains('num-one')) {
+        submitButton.classList.remove('num-one');
+        submitButton.classList.add('num-two');
+        calculations.numOne = inputField.value;
+        inputField.value = '';
+    } else if (submitButton.classList.contains('num-two')) {
+        submitButton.classList.remove('num-two');
+        submitButton.classList.add('num-one');
+        calculations.numTwo = inputField.value;
+        inputField.value = '';
+    }
+    if (operatorSymbol !== '=') {
+        calculations.operator=operatorSymbol;
+    } else {
+        sendToServer('/calculations', calculations);
+    }
+}
 //updateInput('-', false);
 //updateInput(1, true);
 //updateInput(0, true);
@@ -85,62 +112,80 @@ function updateInput (input, isNumber = false) {
  * @param{url} Address to send to
  * @param{object} Data to be sent
  */
+function sendToServer(url, object) {
+    axios.post(url, object).then((res) => {
+        console.log(res);
+    }).catch((error) => {
+        console.log(error);
+    });
+}
 
 /**
  * GET information from server.
  * @param{url} Address to recieve from
  */
+function getFromServer(url) {
+    axios.get(url).then((res) => {
+        console.log(res);
+    }).catch((error) => {
+        console.log(error);
+    });
+}
 
 // Event listeners
 // Numbers
 oneButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(1);
+    updateInput(1, true);
 });
 twoButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(2);
+    updateInput(2, true);
 });
 threeButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(3);
+    updateInput(3, true);
 });
 fourButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(4);
+    updateInput(4, true);
 });
 fiveButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(5);
+    updateInput(5, true);
 });
 sixButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(6);
+    updateInput(6, true);
 });
 sevenButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(7);
+    updateInput(7, true);
 });
 eightButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(8);
+    updateInput(8, true);
 });
 nineButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(9);
+    updateInput(9, true);
 });
 zeroButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput(0);
+    updateInput(0, true);
 });
 decimalButton.addEventListener('click', (event) => {
     event.preventDefault();
-    updateInput('.');
+    updateInput('.', true);
 })
 // Operators
 clearButton.addEventListener('click', (event) => {
     event.preventDefault();
     inputField.value = '';
+})
+positiveNegativeButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(null, false);
 })
 // Addition
 // Subtraction

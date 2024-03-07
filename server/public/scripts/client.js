@@ -1,34 +1,79 @@
 // Global Variables
 // Calculator Variables
 // Row one
-const clearButton = document.getElementById('clear-button');
-const positiveNegativeButton = document.getElementById('positive-negative-button');
-const percentageButton = document.getElementById('percentage-button');
-const divideButton = document.getElementById('divide-button');
+const clearButton = 
+document.getElementById('clear-button');
+
+const positiveNegativeButton = 
+document.getElementById('positive-negative-button');
+
+const percentageButton = 
+document.getElementById('percentage-button');
+
+const divideButton = 
+document.getElementById('divide-button');
+
 // Row two
-const sevenButton = document.getElementById('seven-button');
-const eightButton = document.getElementById('eight-button');
-const nineButton = document.getElementById('nine-button');
-const multiplyButton = document.getElementById('multiply-button');
+const sevenButton = 
+document.getElementById('seven-button');
+
+const eightButton = 
+document.getElementById('eight-button');
+
+const nineButton =
+document.getElementById('nine-button');
+
+const multiplyButton = 
+document.getElementById('multiply-button');
+
 // Row three
-const fourButton = document.getElementById('four-button');
-const fiveButton = document.getElementById('five-button');
-const sixButton = document.getElementById('six-button');
-const subtractButton = document.getElementById('subtract-button');
+const fourButton = 
+document.getElementById('four-button');
+
+const fiveButton = 
+document.getElementById('five-button');
+
+const sixButton = 
+document.getElementById('six-button');
+
+const subtractButton = 
+document.getElementById('subtract-button');
+
 // Row four
-const oneButton = document.getElementById('one-button');
-const twoButton = document.getElementById('two-button');
-const threeButton = document.getElementById('three-button');
-const additionButton = document.getElementById('addition-button');
+const oneButton = 
+document.getElementById('one-button');
+
+const twoButton = 
+document.getElementById('two-button');
+
+const threeButton = 
+document.getElementById('three-button');
+
+const additionButton = 
+document.getElementById('addition-button');
+
 // Row five
-const zeroButton = document.getElementById('zero-button');
-const decimalButton = document.getElementById('decimal-button');
-const submitButton = document.getElementById('submit-button');
+const zeroButton = 
+document.getElementById('zero-button');
+
+const decimalButton = 
+document.getElementById('decimal-button');
+
+const submitButton = 
+document.getElementById('submit-button');
+
 // Display Fields
-const inputField = document.getElementById('input-field'); // Input type number
-const resultDisplay = document.getElementById('result-display');
-const resultHistory = document.getElementById('result-history');
-// Calculations object as specified by the instructions (for testing)
+const inputField = 
+document.getElementById('input-field');
+
+const resultDisplay = 
+document.getElementById('result-display');
+
+const resultHistory = 
+document.getElementById('result-history');
+
+// Calculations object as specified by the 
+// instructions (for testing)
 let calculations = {
     numOne:0,
     operator:'',
@@ -36,10 +81,12 @@ let calculations = {
     result:0
 }
 
+let isFirstNumber = true;
+
 /**
  * Appends a selected number to the input field
- * @param{any} input
- * @param{boolean} isNumber = false
+ * @param {number/string} input
+ * @param {boolean} isNumber = false
  * need to prevent form submission for buttons
  * that are not the submit button.
  */
@@ -59,61 +106,82 @@ function updateInput (input, isNumber = false) {
     console.log(`After:${inputField.value}`);
 }
 
+/**
+ * Sends information to the calculations array. 
+ * Sends array to the server for calculation 
+ * when two numbers and an operator have been input.
+ * @param {string} operatorSymbol 
+ */
 function operate(operatorSymbol) {
-    if (submitButton.classList.contains('num-one')) {
-        submitButton.classList.remove('num-one');
-        submitButton.classList.add('num-two');
-        calculations.numOne = inputField.value;
-        inputField.value = '';
-    } else if (submitButton.classList.contains('num-two')) {
-        submitButton.classList.remove('num-two');
-        submitButton.classList.add('num-one');
-        calculations.numTwo = inputField.value;
-        inputField.value = '';
-    }
-    if (operatorSymbol !== '=') {
-        calculations.operator=operatorSymbol;
+    let currentInput = parseFloat(inputField.value);
+    if (isFirstNumber) {
+        calculations.numOne = currentInput;
+        isFirstNumber = false;
     } else {
-        sendToServer('/calculations', calculations);
+        calculations.numTwo = currentInput;
+        performCalculation();
     }
+    calculations.operator = operatorSymbol;
+    inputField.value = '';
 }
-//updateInput('-', false);
-//updateInput(1, true);
-//updateInput(0, true);
-//updateInput(0, true);
 
 /**
  * Sends equation information to server
  * as an object to be parsed through.
- * Object will contain 'firstNumber:',
- * 'secondNumber:', and 'operator:'.
+ * Object will contain 'numOne:',
+ * 'numTwo:', 'result:', and 'operator:'.
  * Calls POST function.
  */
+function performCalculation () {
+    if (calculations.numOne !== 0 && 
+        calculations.numTwo !== 0 && 
+        calculations.operator !== '') {
+        sendToServer('/calculations', calculations)
+        .then( result => {
+            inputField.value = result.data.result;
+            calculations.numOne = result.data.result;
+            calculations.numTwo = 0;
+            calculations.operator ='';
+        }).catch ((error => {
+            console.error(`Calculation error, ${error}`);
+            alert(error);
+        }))
+    } else {
+        alert('Error: Invalid calculation');
+    }
+}
+
 
 /**
  * Recieves Result from server as an object.
- * Object will contain 'firstNumber:', 'secondNumber:', 'operator:',
+ * Object will contain 'firstNumber:', 
+ * 'secondNumber:', 'operator:',
  * and 'answer:'.
  * Calls GET function.
  */
 
-/**
- * Submits form calling the send and recieve functions
- * for equations.
- */
 
 /**
  * GET equation history.
  * Calls get function.
  */
+function getHistory() {
+    getFromServer('/history')
+    .then( response => {
+        console.log(response.data);
+    }).catch( error => {
+        console.error('Failed to fetch history:', error);
+    });
+}
 
 /**
  * POST information to server.
- * @param{url} Address to send to
- * @param{object} Data to be sent
+ * @param {string} url to send to
+ * @param {object} object to be sent
  */
 function sendToServer(url, object) {
-    axios.post(url, object).then((res) => {
+    axios.post(url, object)
+    .then((res) => {
         console.log(res);
     }).catch((error) => {
         console.log(error);
@@ -122,10 +190,11 @@ function sendToServer(url, object) {
 
 /**
  * GET information from server.
- * @param{url} Address to recieve from
+ * @param {string} url to recieve from
  */
 function getFromServer(url) {
-    axios.get(url).then((res) => {
+    axios.get(url)
+    .then((res) => {
         console.log(res);
     }).catch((error) => {
         console.log(error);
@@ -188,7 +257,27 @@ positiveNegativeButton.addEventListener('click', (event) => {
     updateInput(null, false);
 })
 // Addition
+additionButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    operate('+');
+})
 // Subtraction
+subtractButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    operate('-');
+})
 // Division
+divideButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    operate('/');
+})
 // Multiplication
+multiplyButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    operate('x');
+})
 // Submit
+submitButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    calculate();
+})

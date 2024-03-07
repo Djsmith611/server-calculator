@@ -90,20 +90,18 @@ function getPercentage() {
  * that are not the submit button.
  */
 function updateInput(input, isNumber = false) {
-  let existingInput = inputField.value;
-  if (clearButton.innerHTML === "C") {
+  let existingInput = inputField.value; // Stores the existing input that needs to be updated
+  if (clearButton.innerHTML === "C") { // Updates the clear button to display that an All clear is next
     isClear = false;
     clearButton.innerHTML = "AC";
   }
-  if (!isNumber) {
-    // For +/-
+  if (!isNumber) { // Determines if a negative symbol is being removed or added
     if (existingInput.startsWith("-")) {
       inputField.value = existingInput.slice(1);
     } else {
-      // Else add -
       inputField.value = `-${existingInput}`;
     }
-    if (isFirstNumber) {
+    if (isFirstNumber) { // Updates the necessary number
       calculations.numOne = parseFloat(inputField.value);
       numOneDisplay.innerHTML = `${inputField.value}`;
       console.log(calculations);
@@ -112,17 +110,33 @@ function updateInput(input, isNumber = false) {
       numTwoDisplay.innerHTML = `${inputField.value}`;
       console.log(calculations);
     }
-  } else {
-    // For appending numbers
-    inputField.value = parseFloat(`${existingInput}${input}`);
-    if (isFirstNumber) {
-      calculations.numOne = parseFloat(inputField.value);
-      numOneDisplay.innerHTML = `${inputField.value}`;
-      console.log(calculations);
+  } else { // If just a number is being updated
+    if (!justCalculated) { // Determines wether the first number will be overriden or not
+      // For appending numbers
+      inputField.value = parseFloat(`${existingInput}${input}`);
+      if (isFirstNumber) {
+        calculations.numOne = parseFloat(inputField.value);
+        numOneDisplay.innerHTML = `${inputField.value}`;
+        console.log(calculations);
+      } else {
+        calculations.numTwo = parseFloat(inputField.value);
+        numTwoDisplay.innerHTML = `${inputField.value}`;
+        console.log(calculations);
+      }
     } else {
-      calculations.numTwo = parseFloat(inputField.value);
-      numTwoDisplay.innerHTML = `${inputField.value}`;
-      console.log(calculations);
+      // For replacing the first number in an equation(ending a chain calculation)
+      inputField.value = parseFloat(`${input}`);
+      if (isFirstNumber) {
+        calculations.numOne = parseFloat(inputField.value);
+        numOneDisplay.innerHTML = `${inputField.value}`;
+        console.log(calculations);
+        justCalculated = false;
+      } else {
+        calculations.numTwo = parseFloat(inputField.value);
+        numTwoDisplay.innerHTML = `${inputField.value}`;
+        console.log(calculations);
+        justCalculated = false;
+      }
     }
   }
 }
@@ -136,14 +150,14 @@ function updateInput(input, isNumber = false) {
 function operate(operatorSymbol) {
   calculations.operator = operatorSymbol;
   operatorDisplay.innerHTML = `${operatorSymbol}`;
-  if (calculations.numOne !== 0 && isFirstNumber) {
-    inputField.placeholder = inputField.value;
-    numOneDisplay.innerHTML = inputField.value;
-  }
+  numOneDisplay.innerHTML = `${calculations.numOne}`;
+  inputField.placeholder = `${calculations.numOne}`;
   inputField.value = "";
   console.log(calculations);
   isFirstNumber = false;
 }
+
+let justCalculated = false; // Initialize calculated state
 
 /**
  * Sends equation information to server
@@ -158,7 +172,7 @@ async function performCalculation() {
     calculations.numTwo !== undefined &&
     calculations.operator !== ""
   ) {
-    await sendToServer("/calculations", calculations)
+    await sendToServer("/calculations", calculations) // Ensures the information is sent and retrieved from the server prior to continuing
       .then((result) => {
         let calculationResult = parseFloat(result.data.result);
         resultDisplay.innerHTML = `=${calculationResult}`;
@@ -168,7 +182,7 @@ async function performCalculation() {
         calculations.numOne = calculationResult;
         calculations.numTwo = 0;
         calculations.operator = "";
-        isFirstNumber = false;
+        isFirstNumber = true;
         setTimeout(1000);
         inputField.value = "";
         displayHistory();
@@ -176,6 +190,7 @@ async function performCalculation() {
         numTwoDisplay.innerHTML = "";
         operatorDisplay.innerHTML = "";
         resultDisplay.innerHTML = "";
+        justCalculated = true;
       })
       .catch((error) => {
         console.error(`Calculation error, ${error}`);
@@ -187,14 +202,14 @@ async function performCalculation() {
 }
 
 /**
- * GET history from sserver and append it to the DOM
+ * GET history from server and append it to the DOM
  */
 function displayHistory() {
   getFromServer("/calculations")
     .then((response) => {
       let history = response.data;
       resultHistory.innerHTML = "";
-      history.forEach((calculation) => {
+      history.forEach(calculation => {
         let item = document.createElement("li");
         item.innerHTML = `
         ${calculation.numOne} 
@@ -202,14 +217,16 @@ function displayHistory() {
         ${calculation.numTwo} = 
         ${calculation.result}`;
         resultHistory.appendChild(item);
-      });
+    });
     })
     .catch((error) => {
       console.error("Failed to fetch history:", error);
     });
 }
 
-let isClear = false;
+displayHistory(); // Display History on load
+
+let isClear = false; // Initialize cleared state
 
 function clear() {
   if (isClear) {
@@ -371,6 +388,7 @@ submitButton.addEventListener("click", (event) => {
     performCalculation();
   }
 });
+// Percent
 percentageButton.addEventListener("click", (event) => {
   event.preventDefault();
   getPercentage();

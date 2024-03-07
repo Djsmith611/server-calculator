@@ -25,7 +25,7 @@ const zeroButton = document.getElementById('zero-button');
 const decimalButton = document.getElementById('decimal-button');
 const submitButton = document.getElementById('submit-button');
 // Display Fields
-const inputField = document.getElementById('input-field');
+const inputField = document.getElementById('input-field'); // Input type number
 const resultDisplay = document.getElementById('result-display');
 const resultHistory = document.getElementById('result-history');
 /**
@@ -35,6 +35,25 @@ const resultHistory = document.getElementById('result-history');
  * need to prevent form submission for buttons
  * that are not the submit button.
  */
+function updateInput (input, isNumber = false) {
+    let existingInput = inputField.value;
+    console.log(`Before:${existingInput}`);
+    //if(isNumber === false) { // For +/-
+        //if (existingInput.includes('-')){
+            // Remove -
+        //}else { // Else add -
+            //inputField.value = `${input}${existingInput}`;
+        //}
+    //} else {
+        inputField.value = `${existingInput}${input}`;
+    //}
+    console.log(`After:${inputField.value}`);
+}
+
+//updateInput('-', false);
+//updateInput(1, true);
+//updateInput(0, true);
+//updateInput(0, true);
 
 /**
  * Sends equation information to server
@@ -74,5 +93,57 @@ const resultHistory = document.getElementById('result-history');
 
 // Event listeners
 // Numbers
+oneButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(1);
+});
+twoButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(2);
+});
+threeButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(3);
+});
+fourButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(4);
+});
+fiveButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(5);
+});
+sixButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(6);
+});
+sevenButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(7);
+});
+eightButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(8);
+});
+nineButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(9);
+});
+zeroButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput(0);
+});
+decimalButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    updateInput('.');
+})
 // Operators
+clearButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    inputField.value = '';
+})
+// Addition
+// Subtraction
+// Division
+// Multiplication
 // Submit
